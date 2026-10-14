@@ -74,8 +74,8 @@ function SortTh({ label, col, sortKey, sortDir, onSort }: {
 }
 
 // ── Short date label for chart x-axis ─────────────────────────
-function shortDate(d: string) {
-  const parts = d.split("-");
+function shortDate(d: unknown) {
+  const parts = String(d).split("-");
   return `${parts[2]}/${parts[1]}`;
 }
 
