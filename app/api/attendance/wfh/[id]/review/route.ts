@@ -10,7 +10,7 @@ import { requireRole } from '@/lib/auth/require-role'
 // Both actions are blocked if the submission is not currently pending.
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { error: authErr, ctx } = await requireRole(request, ['admin'])
   if (authErr) return authErr
@@ -22,7 +22,7 @@ export async function POST(
     return Response.json({ error: 'action must be "approve" or "reject".' }, { status: 400 })
   }
 
-  const { id } = params
+  const { id } = await params
 
   // Fetch the submission
   const { data: submission, error: fetchErr } = await adminClient

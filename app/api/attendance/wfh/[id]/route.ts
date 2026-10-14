@@ -17,12 +17,12 @@ function isLateSubmission(workDate: string, shiftEndTime: string | null): boolea
 //   proof_file  File    (optional)
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const ctx = await getAuthContext(request)
   if (!ctx) return unauthorized()
 
-  const { id } = params
+  const { id } = await params
 
   // Fetch the submission and verify ownership
   const { data: submission, error: fetchErr } = await adminClient
