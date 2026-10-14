@@ -64,7 +64,7 @@ export default function LeadDetailPage() {
       const updated = await apiPut(`/api/leads/${lead.id}`, token, {
         title: editTitle, notes: editNotes || null,
       });
-      setLead(updated);
+      setLead(updated as Lead);
       setEditing(false);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -78,7 +78,7 @@ export default function LeadDetailPage() {
     setUpdatingStatus(true);
     try {
       const updated = await apiPatch(`/api/leads/${lead.id}/status`, token, { status });
-      setLead(updated);
+      setLead(updated as Lead);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to update status");
     } finally {

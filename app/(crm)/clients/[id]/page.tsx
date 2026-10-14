@@ -128,7 +128,7 @@ export default function CompanyDetailPage() {
         name: editName, industry: editIndustry || null, website: editWebsite || null,
         phone: editPhone || null, address: editAddress || null,
       });
-      setCompany(updated);
+      setCompany(updated as Company);
       setEditing(false);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -142,7 +142,7 @@ export default function CompanyDetailPage() {
     setAddingContact(true);
     try {
       const created = await apiPost("/api/contacts", token, { ...newContact, company_id: id });
-      setContacts((prev) => [...prev, created]);
+      setContacts((prev) => [...prev, created as Contact]);
       setNewContact({ first_name: "", last_name: "", email: "", phone: "", title: "", is_primary: false });
       setShowAddContact(false);
     } catch (e: unknown) {

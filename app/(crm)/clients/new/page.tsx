@@ -244,8 +244,8 @@ export default function NewCompanyPage() {
     if (!token) return;
     try {
       const created = await apiPost("/api/service-categories", token, { name: catName });
-      setCategories((prev) => [...prev, created]);
-      setSelectedCats((prev) => [...prev, created]);
+      setCategories((prev) => [...prev, created as Category]);
+      setSelectedCats((prev) => [...prev, created as Category]);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to create category");
     }
@@ -327,7 +327,7 @@ export default function NewCompanyPage() {
           })),
       });
 
-      router.push(`/clients/${result.id}`);
+      router.push(`/clients/${(result as { id: string }).id}`);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Something went wrong");
       setSubmitting(false);

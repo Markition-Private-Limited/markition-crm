@@ -105,7 +105,7 @@ export async function POST(request: Request) {
   } catch (err: unknown) {
     // Compensating rollback: delete the company — FK cascades clean up categories, contacts, prospects
     if (companyId) {
-      await adminClient.from('companies').delete().eq('id', companyId).catch(() => {})
+      await adminClient.from('companies').delete().eq('id', companyId)
     }
     const msg = err instanceof Error ? err.message : 'Wizard failed'
     console.error('[wizard] error:', msg)

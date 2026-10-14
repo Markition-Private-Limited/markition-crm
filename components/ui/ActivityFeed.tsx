@@ -114,7 +114,7 @@ export function ActivityFeed({ entityType, entityId }: ActivityFeedProps) {
       `/api/activity?entity_type=${encodeURIComponent(entityType)}&entity_id=${encodeURIComponent(entityId)}`,
       token
     )
-      .then(setEntries)
+      .then((data) => setEntries(data as ActivityEntry[]))
       .catch((e: unknown) =>
         setError(e instanceof Error ? e.message : "Failed to load activity")
       )

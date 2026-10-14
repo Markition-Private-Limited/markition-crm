@@ -88,7 +88,7 @@ export default function ProspectDetailPage() {
         source: editSource || null,
         status: editStatus,
       });
-      setProspect((prev) => prev ? { ...prev, ...updated, companies: prev.companies } : updated);
+      setProspect((prev) => prev ? { ...prev, ...(updated as Prospect), companies: prev.companies } : (updated as Prospect));
       setEditing(false);
       setActivityKey((k) => k + 1);
     } catch (e: unknown) {

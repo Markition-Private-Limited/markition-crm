@@ -112,7 +112,7 @@ export default function AttendanceAnalyticsPage() {
     if (!token || !dateFrom || !dateTo) return;
     setLoading(true); setError(null);
     apiGet(`/api/attendance/analytics?date_from=${dateFrom}&date_to=${dateTo}`, token)
-      .then((d: AnalyticsData) => setData(d))
+      .then((d) => setData(d as AnalyticsData))
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
   }, [token, dateFrom, dateTo]);

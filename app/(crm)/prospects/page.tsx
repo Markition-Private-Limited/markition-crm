@@ -87,7 +87,7 @@ export default function ProspectsPage() {
         source: newSource || undefined,
       });
       const company = companies.find((c) => c.id === newCompanyId) ?? null;
-      setProspects((prev) => [{ ...created, companies: company }, ...prev]);
+      setProspects((prev) => [{ ...(created as Prospect), companies: company }, ...prev]);
       setShowModal(false);
       setNewCompanyId(""); setNewName(""); setNewNotes(""); setNewSource("");
     } catch (e: unknown) {

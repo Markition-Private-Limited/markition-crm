@@ -107,11 +107,12 @@ export default function AttendanceCalendarPage() {
     const qs = new URLSearchParams({ date_from: dateFrom, date_to: dateTo });
     if (filterProfile) qs.set("profile_id", filterProfile);
     apiGet(`/api/attendance/calendar?${qs}`, token)
-      .then((res: EmployeeCalendar[]) => {
-        setData(res)
+      .then((res) => {
+        const data = res as EmployeeCalendar[]
+        setData(data)
         // Only update the dropdown list when fetching everyone
         if (!filterProfile) {
-          setAllEmployees(res.map((e) => ({ profile_id: e.profile_id, full_name: e.full_name })))
+          setAllEmployees(data.map((e) => ({ profile_id: e.profile_id, full_name: e.full_name })))
         }
       })
       .catch((e: Error) => setError(e.message))
