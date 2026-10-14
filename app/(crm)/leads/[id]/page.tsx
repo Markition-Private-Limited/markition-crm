@@ -45,7 +45,7 @@ export default function LeadDetailPage() {
   React.useEffect(() => {
     if (!token || !id) return;
     apiGet(`/api/leads/${id}`, token)
-      .then(setLead)
+      .then((data) => setLead(data as Lead))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [token, id]);

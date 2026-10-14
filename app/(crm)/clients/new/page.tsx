@@ -234,7 +234,7 @@ export default function NewCompanyPage() {
   React.useEffect(() => {
     if (!token) return;
     apiGet("/api/service-categories", token)
-      .then(setCategories)
+      .then((data) => setCategories(data as Category[]))
       .catch(() => {});
   }, [token]);
 

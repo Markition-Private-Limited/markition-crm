@@ -33,7 +33,7 @@ export default function ClientsPage() {
     setLoading(true);
     const qs = search ? `?search=${encodeURIComponent(search)}` : "";
     apiGet(`/api/companies${qs}`, token)
-      .then(setCompanies)
+      .then((data) => setCompanies(data as Company[]))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [token, search]);

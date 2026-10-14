@@ -64,7 +64,7 @@ export default function ProspectDetailPage() {
   React.useEffect(() => {
     if (!token || !id) return;
     apiGet(`/api/prospects/${id}`, token)
-      .then(setProspect)
+      .then((data) => setProspect(data as Prospect))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [token, id]);

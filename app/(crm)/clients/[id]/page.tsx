@@ -91,7 +91,7 @@ export default function CompanyDetailPage() {
     setLoading(true);
     loadedTabsRef.current = new Set();
     apiGet(`/api/companies/${id}`, token)
-      .then(setCompany)
+      .then((data) => setCompany(data as Company))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [token, id]);
@@ -103,9 +103,9 @@ export default function CompanyDetailPage() {
     loadedTabsRef.current.add(tab);
     setTabLoading(true);
     const req =
-      tab === "contacts" ? apiGet(`/api/contacts?company_id=${id}`, token).then(setContacts) :
-      tab === "prospects" ? apiGet(`/api/prospects?company_id=${id}`, token).then(setProspects) :
-      tab === "tasks" ? apiGet(`/api/tasks?company_id=${id}`, token).then(setTasks) :
+      tab === "contacts" ? apiGet(`/api/contacts?company_id=${id}`, token).then((d) => setContacts(d as Contact[])) :
+      tab === "prospects" ? apiGet(`/api/prospects?company_id=${id}`, token).then((d) => setProspects(d as Prospect[])) :
+      tab === "tasks" ? apiGet(`/api/tasks?company_id=${id}`, token).then((d) => setTasks(d as Task[])) :
       Promise.resolve();
     req.catch(() => {}).finally(() => setTabLoading(false));
   }, [token, id, tab, loading]);
