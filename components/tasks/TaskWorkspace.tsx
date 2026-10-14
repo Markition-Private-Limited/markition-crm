@@ -21,6 +21,9 @@ import {
   type TaskComment,
 } from "@/src/modules/tasks/task-types";
 import { updateTask as updateTaskClient } from "@/src/modules/tasks/task-client";
+import type { AuditLogEntry } from "@/src/modules/audit/audit-service";
+
+const AUDITED_FIELDS = ["status", "priority", "due_date", "start_date", "title", "description", "assignee"] as const;
 
 type TaskWorkspaceProps = {
   task: Task;
@@ -32,6 +35,8 @@ type TaskWorkspaceProps = {
     quotation?: string;
     contract?: string;
   };
+  canEdit?: boolean;
+  auditLogs?: AuditLogEntry[];
 };
 
 function updateChecklistItem(
@@ -55,9 +60,10 @@ function updateChecklistItem(
   });
 }
 
-export function TaskWorkspace({ task, taskOptions, entityNames }: TaskWorkspaceProps) {
+export function TaskWorkspace({ task, taskOptions, entityNames, canEdit = true, auditLogs = [] }: TaskWorkspaceProps) {
   const router = useRouter();
   const [localTask, setLocalTask] = React.useState<Task>(task);
+  const [localLogs, setLocalLogs] = React.useState<AuditLogEntry[]>(auditLogs);
   const [commentDraft, setCommentDraft] = React.useState("");
   const [editingCommentId, setEditingCommentId] = React.useState<string | null>(null);
   const [commentEditDraft, setCommentEditDraft] = React.useState("");
@@ -72,7 +78,16 @@ export function TaskWorkspace({ task, taskOptions, entityNames }: TaskWorkspaceP
     setIsSaving(true);
     setError(null);
 
-    const { error: updateError } = await updateTaskClient(localTask.id, patch);
+    // Compute diff for audited fields
+    const changes: Record<string, { from: unknown; to: unknown }> = {};
+    for (const field of AUDITED_FIELDS) {
+      const patchVal = (patch as Record<string, unknown>)[field];
+      if (patchVal !== undefined && patchVal !== (localTask as Record<string, unknown>)[field]) {
+        changes[field] = { from: (localTask as Record<string, unknown>)[field], to: patchVal };
+      }
+    }
+
+    const { error: updateError } = await updateTaskClient(localTask.id, patch, changes);
     if (updateError) {
       setError(updateError.message);
       setIsSaving(false);
@@ -84,6 +99,23 @@ export function TaskWorkspace({ task, taskOptions, entityNames }: TaskWorkspaceP
       ...patch,
       updated_at: new Date().toISOString(),
     }));
+
+    // Optimistic audit log entry
+    if (Object.keys(changes).length > 0) {
+      setLocalLogs((prev) => [
+        ...prev,
+        {
+          id: `opt-${Date.now()}`,
+          actor_id: null,
+          action: "updated",
+          resource_type: "task",
+          resource_id: localTask.id,
+          changes: { ...changes, _actor_email: "you" },
+          created_at: new Date().toISOString(),
+        },
+      ]);
+    }
+
     setIsSaving(false);
   };
 
@@ -184,7 +216,12 @@ export function TaskWorkspace({ task, taskOptions, entityNames }: TaskWorkspaceP
         actions={
           <>
             <WorkflowStatusBadge module="tasks" status={localTask.status} archived={localTask.archived} />
-            <Button variant="secondary" onClick={() => router.push("/tasks")}>Back to Tasks</Button>
+            {(localTask as any).project_id && (
+              <Button variant="secondary" onClick={() => router.push(`/projects/${(localTask as any).project_id}`)}>
+                Back to Project
+              </Button>
+            )}
+            <Button variant="secondary" onClick={() => router.push("/tasks")}>All Tasks</Button>
           </>
         }
       />
@@ -192,6 +229,12 @@ export function TaskWorkspace({ task, taskOptions, entityNames }: TaskWorkspaceP
       {error ? (
         <div className="rounded-[16px] border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">{error}</div>
       ) : null}
+
+      {!canEdit && (
+        <div className="rounded-[16px] border border-border bg-surface-muted px-4 py-3 text-sm text-muted-foreground">
+          You can view this task but you are not the creator, assignee, or a project member — editing is disabled.
+        </div>
+      )}
 
       <div className="grid gap-4 xl:grid-cols-[1.5fr_1fr]">
         <div className="space-y-4">
@@ -342,19 +385,20 @@ export function TaskWorkspace({ task, taskOptions, entityNames }: TaskWorkspaceP
                 module="tasks"
                 value={localTask.status}
                 currentStatus={localTask.status}
-                onChange={handleStatusChange}
+                onChange={canEdit ? handleStatusChange : () => {}}
               />
 
               <Input
                 label="Priority"
                 value={localTask.priority ?? "Medium"}
-                onChange={(event) => persist({ priority: event.target.value as Task["priority"] })}
+                onChange={(event) => canEdit && persist({ priority: event.target.value as Task["priority"] })}
+                readOnly={!canEdit}
               />
 
-              <Input label="Assignee" value={localTask.assignee ?? ""} onChange={(event) => persist({ assignee: event.target.value })} />
-              <Input label="Reporter" value={localTask.reporter ?? ""} onChange={(event) => persist({ reporter: event.target.value })} />
-              <Input label="Start Date" type="date" value={localTask.start_date ?? ""} onChange={(event) => persist({ start_date: event.target.value || undefined })} />
-              <Input label="Due Date" type="date" value={localTask.due_date ?? ""} onChange={(event) => persist({ due_date: event.target.value || undefined })} />
+              <Input label="Assignee" value={localTask.assignee ?? ""} onChange={(event) => canEdit && persist({ assignee: event.target.value })} readOnly={!canEdit} />
+              <Input label="Reporter" value={localTask.reporter ?? ""} onChange={(event) => canEdit && persist({ reporter: event.target.value })} readOnly={!canEdit} />
+              <Input label="Start Date" type="date" value={localTask.start_date ?? ""} onChange={(event) => canEdit && persist({ start_date: event.target.value || undefined })} readOnly={!canEdit} />
+              <Input label="Due Date" type="date" value={localTask.due_date ?? ""} onChange={(event) => canEdit && persist({ due_date: event.target.value || undefined })} readOnly={!canEdit} />
 
               <div className="rounded-[14px] border border-border bg-surface-muted p-3 text-sm">
                 <p className="font-medium text-foreground">Linked records</p>
@@ -406,6 +450,55 @@ export function TaskWorkspace({ task, taskOptions, entityNames }: TaskWorkspaceP
             </CardBody>
           </Card>
         </div>
+      </div>
+
+      {/* Changelog */}
+      <div className="rounded-3xl border border-border bg-surface p-5 shadow-sm shadow-black/5">
+        <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Changelog</h3>
+        {localLogs.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">No changes recorded yet.</p>
+        ) : (
+          <ol className="mt-3 space-y-2">
+            {localLogs.map((log) => {
+              const actor = (log.changes as any)?._actor_email ?? log.actor_id ?? "Unknown";
+              const dateStr = new Date(log.created_at).toLocaleString(undefined, {
+                month: "short", day: "numeric", year: "numeric",
+                hour: "2-digit", minute: "2-digit",
+              });
+
+              const isCreated = log.action === "created" || (log.changes as any)?._created;
+
+              const diffs = Object.entries(log.changes ?? {})
+                .filter(([k]) => !k.startsWith("_") && k !== "assigned_to")
+                .map(([field, val]) => {
+                  if (isCreated) return null;
+                  const v = val as { from: unknown; to: unknown };
+                  const from = v?.from != null ? String(v.from) : "—";
+                  const to = v?.to != null ? String(v.to) : "—";
+                  return `${field.replace(/_/g, " ")}: ${from} → ${to}`;
+                })
+                .filter(Boolean);
+
+              return (
+                <li key={log.id} className="flex gap-3 rounded-2xl border border-border bg-surface-muted px-4 py-3 text-sm">
+                  <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-accent" />
+                  <div className="min-w-0 flex-1">
+                    <span className="font-medium text-foreground">{actor}</span>
+                    {" "}
+                    {isCreated ? (
+                      <span className="text-muted-foreground">created this task</span>
+                    ) : (
+                      <span className="text-muted-foreground">
+                        updated: {diffs.length > 0 ? diffs.join(" · ") : "task fields"}
+                      </span>
+                    )}
+                    <p className="mt-0.5 text-xs text-muted-foreground">{dateStr}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
       </div>
     </div>
   );
