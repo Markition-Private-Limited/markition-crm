@@ -199,10 +199,10 @@ export default function DashboardPage() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/companies"
+                  href="/clients"
                   className="flex items-center justify-between rounded-[18px] border border-border bg-surface-muted px-4 py-3 text-sm font-medium text-foreground hover:bg-surface-elevated transition"
                 >
-                  <span className="inline-flex items-center gap-2"><Building2 className="h-4 w-4" /> Companies</span>
+                  <span className="inline-flex items-center gap-2"><Building2 className="h-4 w-4" /> Clients</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

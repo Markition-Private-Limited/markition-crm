@@ -94,8 +94,8 @@ export default function TaskDetailPage() {
   const parentIsClient = !!task.client_id;
   const parentId = task.company_id ?? task.client_id;
   const parentHref = parentIsClient
-    ? `/clients/${task.client_id}`
-    : task.company_id ? `/companies/${task.company_id}` : null;
+    ? `/active-clients/${task.client_id}`
+    : task.company_id ? `/clients/${task.company_id}` : null;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">

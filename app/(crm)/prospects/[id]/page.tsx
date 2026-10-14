@@ -160,7 +160,7 @@ export default function ProspectDetailPage() {
           <CheckCircle2 className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
           <p className="text-sm text-green-800 dark:text-green-300">
             An Active Client record was automatically created for this deal.{" "}
-            <Link href={`/clients?prospect_id=${prospect.id}`} className="font-semibold underline">
+            <Link href={`/active-clients?prospect_id=${prospect.id}`} className="font-semibold underline">
               View Client
             </Link>
           </p>
@@ -201,7 +201,7 @@ export default function ProspectDetailPage() {
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <Building2 className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <Link href={`/companies/${prospect.company_id}`} className="text-sm text-accent hover:underline">
+            <Link href={`/clients/${prospect.company_id}`} className="text-sm text-accent hover:underline">
               {companyName}
             </Link>
           </div>

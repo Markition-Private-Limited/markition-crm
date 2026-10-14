@@ -33,9 +33,19 @@ export async function POST(request: Request) {
       .eq('is_primary', true)
   }
 
+  const insertData: Record<string, unknown> = {
+    company_id,
+    first_name,
+    is_primary: is_primary ?? false,
+  }
+  if (last_name !== undefined && last_name !== '') insertData.last_name = last_name
+  if (email !== undefined && email !== '') insertData.email = email
+  if (phone !== undefined && phone !== '') insertData.phone = phone
+  if (title !== undefined && title !== '') insertData.title = title
+
   const { data, error: dbErr } = await adminClient
     .from('contacts')
-    .insert({ company_id, first_name, last_name, email, phone, title, is_primary: is_primary ?? false })
+    .insert(insertData)
     .select()
     .single()
 

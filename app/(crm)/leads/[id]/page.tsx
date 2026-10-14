@@ -159,7 +159,7 @@ export default function LeadDetailPage() {
           {lead.company_id && (
             <div className="flex items-center gap-3">
               <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
-              <Link href={`/companies/${lead.company_id}`} className="text-sm text-accent hover:underline">View linked company</Link>
+              <Link href={`/clients/${lead.company_id}`} className="text-sm text-accent hover:underline">View linked company</Link>
             </div>
           )}
           <div>

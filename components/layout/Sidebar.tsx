@@ -15,9 +15,9 @@ type NavSection = { heading: string; items: NavItem[] };
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard",      href: "/dashboard",  icon: Home,          roles: ["admin", "project_manager", "sales"] },
-  { label: "Clients",        href: "/companies",  icon: Building2,     roles: ["admin", "project_manager"] },
-  { label: "Prospects",      href: "/prospects",  icon: Target,        roles: ["admin", "sales"] },
-  { label: "Active Clients", href: "/clients",    icon: Briefcase,     roles: ["admin", "project_manager", "sales"] },
+  { label: "Clients",        href: "/clients",         icon: Building2,     roles: ["admin", "project_manager"] },
+  { label: "Prospects",      href: "/prospects",       icon: Target,        roles: ["admin", "sales"] },
+  { label: "Active Clients", href: "/active-clients",  icon: Briefcase,     roles: ["admin", "project_manager", "sales"] },
   { label: "Tasks",          href: "/tasks",      icon: ClipboardList, roles: ["admin", "project_manager"] },
 ];
 

@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronRight, Plus, Trash2, TrendingUp, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 import { useSessionProvider } from "@/src/providers/SessionProvider";
 import { apiGet, apiPost, apiDelete } from "@/lib/api";
 
@@ -11,9 +12,15 @@ import { apiGet, apiPost, apiDelete } from "@/lib/api";
 
 type Category = { id: string; name: string };
 type ContactDraft = { first_name: string; last_name: string; email: string; phone: string; title: string; is_primary: boolean };
-type ProspectDraft = { notes: string; status: "new" | "contacted"; convertToLead: boolean; leadTitle: string };
+type ProspectDraft = { notes: string; status: "first_contact" | "follow_up" | "discovery_call" | "closing"; convertToLead: boolean; leadTitle: string };
 
-const PROSPECT_STATUSES = ["new", "contacted"] as const;
+const PROSPECT_STATUSES = ["first_contact", "follow_up", "discovery_call", "closing"] as const;
+const PROSPECT_STATUS_LABELS: Record<string, string> = {
+  first_contact: "First Contact",
+  follow_up: "Follow Up",
+  discovery_call: "Discovery Call",
+  closing: "Closing",
+};
 const STEPS = ["Client Info", "Add Contacts", "Add Prospects"] as const;
 
 // ─── Validation helpers ───────────────────────────────────────────────────────
@@ -40,11 +47,15 @@ function FieldError({ msg }: { msg: string | null }) {
   return <p className="mt-1 text-xs text-danger">{msg}</p>;
 }
 
+function OptLabel() {
+  return <span className="ml-1 text-xs font-normal text-muted-foreground">(optional)</span>;
+}
+
 function emptyContact(): ContactDraft {
   return { first_name: "", last_name: "", email: "", phone: "", title: "", is_primary: false };
 }
 function emptyProspect(): ProspectDraft {
-  return { notes: "", status: "new", convertToLead: false, leadTitle: "" };
+  return { notes: "", status: "first_contact", convertToLead: false, leadTitle: "" };
 }
 
 // ─── Step indicator ──────────────────────────────────────────────────────────
@@ -114,7 +125,7 @@ function CategoryCombobox({
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between">
-        <label className="text-sm font-medium text-foreground">Service Categories</label>
+        <label className="text-sm font-medium text-foreground">Service Categories <span className="ml-1 text-xs font-normal text-muted-foreground">(optional)</span></label>
         {canCreate && <span className="text-xs text-muted-foreground">Type a new name to create one</span>}
       </div>
       <div ref={ref} className="relative">
@@ -281,7 +292,7 @@ export default function NewCompanyPage() {
     if (validateStep2()) setStep(2);
   };
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
+  // ── Submit — single atomic request, all-or-nothing ────────────────────────
 
   const handleSubmit = async () => {
     if (!token || !name.trim()) return;
@@ -289,37 +300,34 @@ export default function NewCompanyPage() {
     setError(null);
 
     try {
-      const company = await apiPost("/api/companies", token, {
-        name: name.trim(), industry: industry || undefined, website: website || undefined,
-        phone: phone || undefined, address: address || undefined,
+      const result = await apiPost("/api/companies/wizard", token, {
+        name: name.trim(),
+        industry: industry.trim() || undefined,
+        website: website.trim() || undefined,
+        phone: phone.trim() || undefined,
+        address: address.trim() || undefined,
+        category_ids: selectedCats.map((c) => c.id),
+        contacts: contacts
+          .filter((c) => c.first_name.trim())
+          .map((c) => ({
+            first_name: c.first_name.trim(),
+            last_name: c.last_name.trim() || undefined,
+            email: c.email.trim() || undefined,
+            phone: c.phone.trim() || undefined,
+            title: c.title.trim() || undefined,
+            is_primary: c.is_primary,
+          })),
+        prospects: prospects
+          .filter((p) => p.notes.trim() || p.convertToLead)
+          .map((p) => ({
+            notes: p.notes.trim() || undefined,
+            status: p.status,
+            convertToLead: canConvert ? p.convertToLead : false,
+            leadTitle: p.leadTitle.trim() || undefined,
+          })),
       });
 
-      for (const cat of selectedCats) {
-        await apiPost(`/api/companies/${company.id}/categories`, token, { service_category_id: cat.id });
-      }
-
-      for (const c of contacts) {
-        if (!c.first_name.trim()) continue;
-        await apiPost("/api/contacts", token, {
-          company_id: company.id, first_name: c.first_name, last_name: c.last_name || undefined,
-          email: c.email || undefined, phone: c.phone || undefined,
-          title: c.title || undefined, is_primary: c.is_primary,
-        });
-      }
-
-      for (const p of prospects) {
-        if (!p.notes.trim() && !p.convertToLead) continue;
-        const created = await apiPost("/api/prospects", token, {
-          company_id: company.id, notes: p.notes || undefined, status: p.status,
-        });
-        if (p.convertToLead && canConvert) {
-          await apiPost(`/api/prospects/${created.id}/convert`, token, {
-            title: p.leadTitle.trim() || `Lead from ${name.trim()}`,
-          });
-        }
-      }
-
-      router.push(`/companies/${company.id}`);
+      router.push(`/clients/${result.id}`);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Something went wrong");
       setSubmitting(false);
@@ -360,39 +368,39 @@ export default function NewCompanyPage() {
               onChange={(e) => { setName(e.target.value); if (e.target.value.trim()) setNameErr(null); }}
               onBlur={() => setNameErr(name.trim() ? null : "Client name is required")}
               placeholder="Acme Corp"
+              maxLength={100}
               className={`field ${nameErr ? "border-danger" : ""}`}
             />
             <FieldError msg={nameErr} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1">
-              <label className="text-sm font-medium text-foreground">Industry</label>
-              <input value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="Technology" className="field" />
+              <label className="text-sm font-medium text-foreground">Industry <OptLabel /></label>
+              <input value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="Technology" maxLength={100} className="field" />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-foreground">Phone</label>
-              <input
+              <label className="text-sm font-medium text-foreground">Phone <OptLabel /></label>
+              <PhoneInput
                 value={phone}
-                onChange={(e) => { setPhone(e.target.value); setPhoneErr(validatePhone(e.target.value)); }}
-                onBlur={() => setPhoneErr(validatePhone(phone))}
-                placeholder="+1-555-0100"
-                className={`field ${phoneErr ? "border-danger" : ""}`}
+                onChange={(v) => { setPhone(v); setPhoneErr(validatePhone(v)); }}
+                className={phoneErr ? "border-danger" : ""}
               />
               <FieldError msg={phoneErr} />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-foreground">Website</label>
+              <label className="text-sm font-medium text-foreground">Website <OptLabel /></label>
               <input
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="https://acme.com"
+                maxLength={255}
                 className={`field ${websiteErr ? "border-danger" : ""}`}
               />
               <FieldError msg={websiteErr} />
             </div>
             <div className="space-y-1">
-              <label className="text-sm font-medium text-foreground">Address</label>
-              <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St" className="field" />
+              <label className="text-sm font-medium text-foreground">Address <OptLabel /></label>
+              <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St" maxLength={255} className="field" />
             </div>
           </div>
           <CategoryCombobox
@@ -431,38 +439,37 @@ export default function NewCompanyPage() {
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">First Name</label>
-                  <input value={c.first_name} onChange={(e) => updateContact(i, "first_name", e.target.value)} placeholder="Jane" className="field" />
+                  <label className="text-xs font-medium text-foreground">First Name <span className="text-danger">*</span></label>
+                  <input value={c.first_name} onChange={(e) => updateContact(i, "first_name", e.target.value)} placeholder="Jane" maxLength={50} className="field" />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Last Name</label>
-                  <input value={c.last_name} onChange={(e) => updateContact(i, "last_name", e.target.value)} placeholder="Doe" className="field" />
+                  <label className="text-xs font-medium text-muted-foreground">Last Name <OptLabel /></label>
+                  <input value={c.last_name} onChange={(e) => updateContact(i, "last_name", e.target.value)} placeholder="Doe" maxLength={50} className="field" />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Email</label>
+                  <label className="text-xs font-medium text-muted-foreground">Email <OptLabel /></label>
                   <input
                     value={c.email}
                     onChange={(e) => { updateContact(i, "email", e.target.value); updateContactErr(i, "email", e.target.value); }}
                     onBlur={() => updateContactErr(i, "email", c.email)}
                     placeholder="jane@acme.com"
+                    maxLength={255}
                     className={`field ${contactErrs[i]?.email ? "border-danger" : ""}`}
                   />
                   <FieldError msg={contactErrs[i]?.email ?? null} />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Phone</label>
-                  <input
+                  <label className="text-xs font-medium text-muted-foreground">Phone <OptLabel /></label>
+                  <PhoneInput
                     value={c.phone}
-                    onChange={(e) => { updateContact(i, "phone", e.target.value); updateContactErr(i, "phone", e.target.value); }}
-                    onBlur={() => updateContactErr(i, "phone", c.phone)}
-                    placeholder="+1-555-0101"
-                    className={`field ${contactErrs[i]?.phone ? "border-danger" : ""}`}
+                    onChange={(v) => { updateContact(i, "phone", v); updateContactErr(i, "phone", v); }}
+                    className={contactErrs[i]?.phone ? "border-danger" : ""}
                   />
                   <FieldError msg={contactErrs[i]?.phone ?? null} />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground">Title</label>
-                  <input value={c.title} onChange={(e) => updateContact(i, "title", e.target.value)} placeholder="CEO" className="field" />
+                  <label className="text-xs font-medium text-muted-foreground">Title <OptLabel /></label>
+                  <input value={c.title} onChange={(e) => updateContact(i, "title", e.target.value)} placeholder="CEO" maxLength={100} className="field" />
                 </div>
                 <div className="flex items-center gap-2 pt-5">
                   <input type="checkbox" id={`primary-${i}`} checked={c.is_primary} onChange={(e) => updateContact(i, "is_primary", e.target.checked)} className="h-4 w-4 rounded border-border" />
@@ -499,13 +506,13 @@ export default function NewCompanyPage() {
                 )}
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Notes</label>
-                <textarea value={p.notes} onChange={(e) => updateProspect(i, "notes", e.target.value)} placeholder="Initial outreach notes…" rows={3} className="field resize-none" />
+                <label className="text-xs font-medium text-muted-foreground">Notes <OptLabel /></label>
+                <textarea value={p.notes} onChange={(e) => updateProspect(i, "notes", e.target.value)} placeholder="Initial outreach notes…" rows={3} maxLength={1000} className="field resize-none" />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-medium text-muted-foreground">Status</label>
                 <select value={p.status} onChange={(e) => updateProspect(i, "status", e.target.value)} className="field">
-                  {PROSPECT_STATUSES.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                  {PROSPECT_STATUSES.map((s) => <option key={s} value={s}>{PROSPECT_STATUS_LABELS[s]}</option>)}
                 </select>
               </div>
             </div>
