@@ -34,13 +34,19 @@ export async function POST(request: Request) {
   const { ctx, error } = await requireRole(request, ['admin', 'project_manager'])
   if (error) return error
 
-  const body = await request.json()
+  let body: Record<string, unknown>
+  try { body = await request.json() }
+  catch { return Response.json({ error: 'Invalid JSON body' }, { status: 400 }) }
+
   const {
     name, industry, website, phone, address,
-    category_ids = [] as string[],
-    contacts = [] as ContactDraft[],
-    prospects = [] as ProspectDraft[],
-  } = body
+    category_ids = [],
+    contacts = [],
+    prospects = [],
+  } = body as {
+    name?: string; industry?: string; website?: string; phone?: string; address?: string;
+    category_ids?: string[]; contacts?: ContactDraft[]; prospects?: ProspectDraft[];
+  }
 
   if (!name?.trim()) return Response.json({ error: 'name is required' }, { status: 400 })
 
