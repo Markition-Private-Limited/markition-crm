@@ -28,6 +28,8 @@ export async function POST(request: Request) {
 
   if (!name) return Response.json({ error: 'name is required' }, { status: 400 })
 
+  const slug = `${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${Date.now()}`
+
   // Track company id so we can roll back on failure
   let companyId: string | null = null
 
@@ -35,7 +37,7 @@ export async function POST(request: Request) {
     // 1. Company
     const { data: company, error: companyErr } = await adminClient
       .from('companies')
-      .insert({ name, industry: industry || null, website: website || null, phone: phone || null, address: address || null })
+      .insert({ name, slug, industry: industry || null, website: website || null, phone: phone || null, address: address || null })
       .select('id, name')
       .single()
 
