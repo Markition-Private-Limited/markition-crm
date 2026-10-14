@@ -362,7 +362,7 @@ export default function AttendanceCalendarPage() {
                           )}
                         </div>
                         {b.exceeded_allowance && (
-                          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-500" title="Exceeded allowance" />
+                          <span title="Exceeded allowance"><AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-500" /></span>
                         )}
                       </div>
                     ))}

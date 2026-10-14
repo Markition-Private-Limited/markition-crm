@@ -1,6 +1,6 @@
 import { adminClient } from '@/lib/supabase/admin'
 
-export type EntityType = 'company' | 'prospect' | 'client' | 'task' | 'contact'
+export type EntityType = 'company' | 'prospect' | 'client' | 'task' | 'contact' | 'lead'
 
 export async function logActivity({
   entityType,

@@ -14,7 +14,7 @@ export async function GET(request: Request) {
 
   const roleByUser: Record<string, string> = {}
   if (userRoles) {
-    for (const row of userRoles as Array<{ user_id: string; app_roles: { name: string } | null }>) {
+    for (const row of (userRoles as unknown) as Array<{ user_id: string; app_roles: { name: string } | null }>) {
       if (row.app_roles) roleByUser[row.user_id] = row.app_roles.name
     }
   }
