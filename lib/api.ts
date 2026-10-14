@@ -21,8 +21,9 @@ async function apiFetch(method: string, path: string, token: string | null, body
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
   if (res.status === 204) return null
-  const data = await res.json()
-  if (!res.ok) throw new Error(data?.error ?? `API error ${res.status}`)
+  let data: Record<string, unknown> | null = null
+  try { data = await res.json() } catch { /* non-JSON body */ }
+  if (!res.ok) throw new Error(data?.error as string ?? `API error ${res.status}`)
 
   if (isGet && _cache) {
     _cache.set(path, { data, expiresAt: Date.now() + CACHE_TTL })

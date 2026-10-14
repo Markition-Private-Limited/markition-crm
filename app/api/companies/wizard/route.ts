@@ -44,17 +44,15 @@ export async function POST(request: Request) {
 
   if (!name?.trim()) return Response.json({ error: 'name is required' }, { status: 400 })
 
-  const client = await pgPool.connect()
+  let client: import('pg').PoolClient | null = null
   try {
+    client = await pgPool.connect()
     await client.query('BEGIN')
 
     // ── 1. Company ──────────────────────────────────────────────────────────
-    const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-    const slug = `${baseSlug}-${Date.now()}`
-
     const { rows: [company] } = await client.query<{ id: string; name: string }>(
-      `INSERT INTO public.companies (name, industry, website, phone, address, slug)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO public.companies (name, industry, website, phone, address)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING id, name`,
       [
         name.trim(),
@@ -62,7 +60,6 @@ export async function POST(request: Request) {
         website?.trim() || null,
         phone?.trim() || null,
         address?.trim() || null,
-        slug,
       ],
     )
 
@@ -138,10 +135,10 @@ export async function POST(request: Request) {
 
     return Response.json({ id: company.id, name: company.name }, { status: 201 })
   } catch (err: unknown) {
-    await client.query('ROLLBACK')
+    if (client) { try { await client.query('ROLLBACK') } catch { /* ignore */ } }
     const msg = err instanceof Error ? err.message : 'Wizard failed'
     return Response.json({ error: msg }, { status: 400 })
   } finally {
-    client.release()
+    if (client) client.release()
   }
 }
