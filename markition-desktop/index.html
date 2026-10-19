@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+  <title>Markition Attendance</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- ── Login view ── -->
+  <div id="login-view" class="view hidden">
+    <div class="login-container">
+      <div class="login-logo">M</div>
+      <h1 class="login-title">Markition</h1>
+      <p class="login-subtitle">Employee Attendance</p>
+
+      <input type="email"    id="login-email"    placeholder="Email address"  autocomplete="email" />
+      <input type="password" id="login-password" placeholder="Password"       autocomplete="current-password" />
+      <button class="btn-primary" id="login-btn">Sign In</button>
+      <p id="login-error" class="error-msg hidden"></p>
+    </div>
+  </div>
+
+  <!-- ── Home view ── -->
+  <div id="home-view" class="view hidden">
+
+    <div class="home-header">
+      <div class="user-block">
+        <div class="user-name" id="user-name">—</div>
+        <div class="today-date" id="today-date">—</div>
+      </div>
+      <button class="btn-ghost" id="logout-btn">Logout</button>
+    </div>
+
+    <!-- Status card -->
+    <div class="status-card">
+      <div class="status-row">
+        <span class="status-dot dot-gray" id="status-dot"></span>
+        <span class="status-label" id="status-label">Loading…</span>
+      </div>
+      <div class="status-detail" id="status-detail"></div>
+    </div>
+
+    <!-- Location toggle -->
+    <div class="location-row" id="location-row">
+      <button class="loc-btn active" id="loc-office" data-loc="office">Office</button>
+      <button class="loc-btn" id="loc-wfh" data-loc="wfh">Work from Home</button>
+    </div>
+    <p class="wfh-status hidden" id="wfh-status"></p>
+
+    <!-- Primary action -->
+    <button class="btn-primary" id="primary-btn" disabled>—</button>
+
+    <!-- Breaks -->
+    <div class="breaks-section">
+      <div class="section-label">Breaks today</div>
+      <div class="breaks-grid">
+        <button class="btn-break" id="long-break-btn" disabled>
+          <div class="break-name">Long Break</div>
+          <div class="break-usage" id="long-break-usage">—</div>
+        </button>
+        <button class="btn-break" id="short-break-btn" disabled>
+          <div class="break-name">Short Break</div>
+          <div class="break-usage" id="short-break-usage">—</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Shift / error messages -->
+    <p class="shift-info hidden" id="shift-info"></p>
+    <p class="error-msg hidden" id="home-error"></p>
+
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

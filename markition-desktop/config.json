@@ -1,0 +1,5 @@
+{
+  "supabaseUrl": "https://cpvwkbpsekxttufzrzgk.supabase.co",
+  "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwdndrYnBzZWt4dHR1ZnpyemdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMTM0NzAsImV4cCI6MjA5Njg4OTQ3MH0.ova7_n2Z2IPzeArNwBSat4J_SyYqQXbvziy5FfOiYUw",
+  "apiBase": "http://localhost:3001"
+}
