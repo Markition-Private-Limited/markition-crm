@@ -1,6 +1,6 @@
 import { adminClient } from '@/lib/supabase/admin'
 
-export type AppRole = 'admin' | 'project_manager' | 'sales'
+export type AppRole = 'admin' | 'project_manager' | 'sales' | 'employee'
 
 const ROLE_MAP: Record<string, AppRole> = {
   'super admin': 'admin',
@@ -9,6 +9,8 @@ const ROLE_MAP: Record<string, AppRole> = {
   'sales manager': 'sales',
   'sales executive': 'sales',
   'sales': 'sales',
+  'employee': 'employee',
+  'accountant': 'employee',
 }
 
 export interface AuthContext {
@@ -54,19 +56,24 @@ export async function getAuthContextFromToken(token: string): Promise<AuthContex
   const cached = ctxCache.get(payload.sub)
   if (cached && cached.expiresAt > Date.now()) return cached.ctx
 
-  // Cache miss — verify signature AND fetch role_id in parallel (use JWT sub for role lookup)
-  const [{ data: { user }, error }, userRoleResult] = await Promise.all([
-    adminClient.auth.getUser(token),
+  // Cache miss — verify token via admin API and fetch role_id in parallel.
+  // adminClient.auth.getUser(token) fails with "Auth session missing!" when persistSession: false
+  // because Supabase JS v2 checks internal session state instead of verifying the JWT directly.
+  // Using admin.getUserById with the sub from the (locally-decoded) JWT avoids that bug.
+  const [userRoleResult, { data: adminUser, error: adminErr }] = await Promise.all([
     adminClient
       .from('user_roles')
       .select('role_id')
       .eq('user_id', payload.sub)
       .limit(1)
       .single(),
+    adminClient.auth.admin.getUserById(payload.sub),
   ])
 
-  if (error || !user) return null
+  if (adminErr || !adminUser?.user) return null
   if (!userRoleResult.data) return null
+
+  const user = adminUser.user
 
   // Single PK lookup — fast
   const { data: roleRow } = await adminClient

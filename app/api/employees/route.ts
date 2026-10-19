@@ -3,7 +3,7 @@ import { requireRole } from '@/lib/auth/require-role'
 import pg from 'pg'
 
 // Roles admin can create — name must match app_roles.name exactly (case-insensitive lookup)
-const ALLOWED_ROLE_NAMES = ['Sales', 'Project Manager']
+const ALLOWED_ROLE_NAMES = ['Sales', 'Project Manager', 'Employee', 'Accountant']
 
 // Direct postgres pool — bypasses PostgREST so auth.users is visible in the same session.
 // This avoids the FK cross-connection visibility issue when inserting into user_roles

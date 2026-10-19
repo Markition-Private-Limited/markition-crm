@@ -32,7 +32,7 @@ async function syncServerSession(accessToken: string | null) {
   }
 }
 
-export type AppRole = "admin" | "project_manager" | "sales";
+export type AppRole = "admin" | "project_manager" | "sales" | "employee";
 
 type SessionContextValue = {
   token: string | null;
@@ -59,6 +59,7 @@ const ROLE_PERMISSIONS: Record<AppRole, string[]> = {
   admin: ["*"],
   project_manager: ["view_dashboard", "view_companies", "view_contacts", "view_tasks", "manage_companies", "manage_contacts", "manage_tasks"],
   sales: ["view_dashboard", "view_leads", "view_prospects", "manage_leads", "manage_prospects"],
+  employee: ["view_dashboard"],
 };
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
