@@ -1,7 +1,7 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 
-// ── GET /api/attendance/calendar ──────────────────────────────
+// â”€â”€ GET /api/attendance/calendar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Admin only. Returns per-employee, per-day attendance status
 // assembled from attendance_records, attendance_breaks, and
 // attendance_wfh_submissions in a single response.
@@ -9,17 +9,17 @@ import { requireRole } from '@/lib/auth/require-role'
 // Query params:
 //   date_from   YYYY-MM-DD  (required)
 //   date_to     YYYY-MM-DD  (required)
-//   profile_id  UUID        (optional — single employee)
+//   profile_id  UUID        (optional â€” single employee)
 //
 // Response: EmployeeCalendar[]
 // Each day status:
-//   present      — has attendance_record with check_in_at
-//   wfh          — attendance_record.status = 'wfh'
-//   pending_wfh  — no record but has a pending wfh_submission
-//   absent       — past date with no record and no approved/pending WFH
-//   null         — future date (not yet known)
+//   present      â€” has attendance_record with check_in_at
+//   wfh          â€” attendance_record.status = 'wfh'
+//   pending_wfh  â€” no record but has a pending wfh_submission
+//   absent       â€” past date with no record and no approved/pending WFH
+//   null         â€” future date (not yet known)
 export async function GET(request: Request) {
-  const { error: authErr } = await requireRole(request, ['admin'])
+  const { error: authErr } = await requireRole(request, ['super_admin', 'admin'])
   if (authErr) return authErr
 
   const url = new URL(request.url)
@@ -88,11 +88,11 @@ export async function GET(request: Request) {
   if (breaksRes.error) return Response.json({ error: breaksRes.error.message }, { status: 500 })
 
   // 4. Build lookup maps
-  // record: profile_id + date → record row
+  // record: profile_id + date â†’ record row
   const recordMap = new Map<string, (typeof recordsRes.data)[number]>()
   for (const r of recordsRes.data ?? []) recordMap.set(`${r.profile_id}|${r.work_date}`, r)
 
-  // breaks: record_id → breaks[]
+  // breaks: record_id â†’ breaks[]
   const breakMap = new Map<string, (typeof breaksRes.data)[number][]>()
   for (const b of breaksRes.data ?? []) {
     const list = breakMap.get(b.attendance_record_id) ?? []
@@ -100,7 +100,7 @@ export async function GET(request: Request) {
     breakMap.set(b.attendance_record_id, list)
   }
 
-  // wfh: profile_id + date → submission row
+  // wfh: profile_id + date â†’ submission row
   const wfhMap = new Map<string, (typeof wfhRes.data)[number]>()
   for (const w of wfhRes.data ?? []) wfhMap.set(`${w.profile_id}|${w.work_date}`, w)
 

@@ -1,10 +1,10 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 import { logTaskChange } from '@/lib/tasks/changelog'
 import { logActivity } from '@/lib/activity'
 
 export async function GET(request: Request) {
-  const { ctx, error } = await requireRole(request, ['admin', 'project_manager'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager'])
   if (error) return error
 
   const url = new URL(request.url)
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { ctx, error } = await requireRole(request, ['admin', 'project_manager'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager'])
   if (error) return error
 
   const body = await request.json()

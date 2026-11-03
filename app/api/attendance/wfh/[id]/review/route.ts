@@ -1,4 +1,4 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 
 // ── POST /api/attendance/wfh/[id]/review ─────────────────────
@@ -12,7 +12,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { error: authErr, ctx } = await requireRole(request, ['admin'])
+  const { error: authErr, ctx } = await requireRole(request, ['super_admin', 'admin'])
   if (authErr) return authErr
 
   const body = await request.json().catch(() => ({})) as { action?: string; note?: string }

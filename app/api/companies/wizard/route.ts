@@ -1,4 +1,4 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 import { logActivity } from '@/lib/activity'
 
@@ -8,7 +8,7 @@ const VALID_STATUSES = ['first_contact', 'follow_up', 'discovery_call', 'closing
 // Creates company + categories + contacts + prospects.
 // On any failure, deletes the company (DB cascades remove all related rows).
 export async function POST(request: Request) {
-  const { ctx, error } = await requireRole(request, ['admin', 'project_manager'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager'])
   if (error) return error
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -105,7 +105,7 @@ export async function POST(request: Request) {
 
     return Response.json({ id: company.id, name: company.name }, { status: 201 })
   } catch (err: unknown) {
-    // Compensating rollback: delete the company — FK cascades clean up categories, contacts, prospects
+    // Compensating rollback: delete the company â€” FK cascades clean up categories, contacts, prospects
     if (companyId) {
       await adminClient.from('companies').delete().eq('id', companyId)
     }

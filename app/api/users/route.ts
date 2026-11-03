@@ -1,8 +1,8 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 
 export async function GET(request: Request) {
-  const { ctx, error } = await requireRole(request, ['admin', 'project_manager', 'sales'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager', 'bd_executive'])
   if (error) return error
 
   const { data: userList, error: listErr } = await adminClient.auth.admin.listUsers()
@@ -25,8 +25,8 @@ export async function GET(request: Request) {
     role: roleByUser[u.id] ?? null,
   }))
 
-  // Sales can only see themselves
-  if (ctx.role === 'sales') {
+  // BD Executive can only see themselves
+  if (ctx.role === 'bd_executive') {
     return Response.json(users.filter((u) => u.id === ctx.userId))
   }
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ChevronLeft, ChevronRight, Home, ClipboardList,
-  Building2, Briefcase, Target, X, Clock, CalendarDays, BarChart2, Users,
+  Building2, Briefcase, Target, X, Clock, CalendarDays, BarChart2, Users, Layers, FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSessionProvider, type AppRole } from "@/src/providers/SessionProvider";
@@ -14,26 +14,28 @@ type NavItem = { label: string; href: string; icon: React.ElementType; roles: Ap
 type NavSection = { heading: string; items: NavItem[] };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Dashboard",      href: "/dashboard",  icon: Home,          roles: ["admin", "project_manager", "sales"] },
-  { label: "Clients",        href: "/clients",         icon: Building2,     roles: ["admin", "project_manager"] },
-  { label: "Prospects",      href: "/prospects",       icon: Target,        roles: ["admin", "sales"] },
-  { label: "Active Clients", href: "/active-clients",  icon: Briefcase,     roles: ["admin", "project_manager", "sales"] },
-  { label: "Tasks",          href: "/tasks",      icon: ClipboardList, roles: ["admin", "project_manager"] },
+  { label: "Dashboard",      href: "/dashboard",       icon: Home,          roles: ["super_admin", "admin", "bd_manager", "bd_executive", "viewer"] },
+  { label: "Clients",        href: "/clients",         icon: Building2,     roles: ["super_admin", "admin", "bd_manager"] },
+  { label: "Prospects",      href: "/prospects",       icon: Target,        roles: ["super_admin", "admin", "bd_manager", "bd_executive", "viewer"] },
+  { label: "Active Clients", href: "/active-clients",  icon: Briefcase,     roles: ["super_admin", "admin", "bd_manager", "bd_executive"] },
+  { label: "Tasks",          href: "/tasks",           icon: ClipboardList, roles: ["super_admin", "admin", "bd_manager"] },
 ];
 
 const NAV_SECTIONS: NavSection[] = [
   {
     heading: "Admin",
     items: [
-      { label: "Employees", href: "/admin/employees", icon: Users, roles: ["admin"] },
+      { label: "Employees",           href: "/admin/employees",             icon: Users,     roles: ["super_admin", "admin"] },
+      { label: "Pipeline Stages",     href: "/admin/pipeline-stages",       icon: Layers,    roles: ["super_admin", "admin"] },
+      { label: "Document Templates",  href: "/admin/document-templates",    icon: FileText,  roles: ["super_admin", "admin"] },
     ],
   },
   {
     heading: "Attendance",
     items: [
-      { label: "Shifts",    href: "/admin/attendance/shifts",   icon: Clock,        roles: ["admin"] },
-      { label: "Calendar",  href: "/admin/attendance/calendar",  icon: CalendarDays, roles: ["admin"] },
-      { label: "Analytics", href: "/admin/attendance/analytics", icon: BarChart2,    roles: ["admin"] },
+      { label: "Shifts",    href: "/admin/attendance/shifts",   icon: Clock,        roles: ["super_admin", "admin"] },
+      { label: "Calendar",  href: "/admin/attendance/calendar",  icon: CalendarDays, roles: ["super_admin", "admin"] },
+      { label: "Analytics", href: "/admin/attendance/analytics", icon: BarChart2,    roles: ["super_admin", "admin"] },
     ],
   },
 ];

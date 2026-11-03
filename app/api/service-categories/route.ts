@@ -1,8 +1,8 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 
 export async function GET(request: Request) {
-  const { ctx, error } = await requireRole(request, ['admin', 'project_manager', 'sales'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager', 'bd_executive'])
   if (error) return error
 
   const { data, error: dbErr } = await adminClient
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { ctx, error } = await requireRole(request, ['admin'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin'])
   if (error) return error
 
   const body = await request.json()

@@ -1,0 +1,39 @@
+{
+  "cookies": [
+    {
+      "name": "markition-crm-theme",
+      "value": "light",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1825271145.775561,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "mk_session",
+      "value": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjY5MDdiMDVhLTNmMjEtNDE1ZC1hOWJkLTY1MDhiMDExMzM5NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NwdndrYnBzZWt4dHR1ZnpyemdrLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI4MmJkOGEyNy02NWU3LTRjYWEtYWUwMC02ZTE3OTZkYzkzNDciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkzNzM4NzUyLCJpYXQiOjE3OTM3MzUxNTIsImVtYWlsIjoiYWRtaW4xQG1hcmtpdGlvbi5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJzZXR1cF9hdHRlbXB0IjoxNzkwODcxNDgyMTI0fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5MzczNTE1Mn1dLCJzZXNzaW9uX2lkIjoiZjMxMTg0NGYtZjM4My00OGE0LWFhNWUtZjBhNzVjMmRlZDIwIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.jy1kO13Zlre2HJQddQIN5MJt_8N0TNzcbSOMmB_0lFc_oQM68X3VyWEBa7JG7ABHpomIZ5MJrXXjQloYbgtzeA",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1793738752.162435,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "sb-cpvwkbpsekxttufzrzgk-auth-token",
+          "value": "{\"access_token\":\"eyJhbGciOiJFUzI1NiIsImtpZCI6IjY5MDdiMDVhLTNmMjEtNDE1ZC1hOWJkLTY1MDhiMDExMzM5NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NwdndrYnBzZWt4dHR1ZnpyemdrLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI4MmJkOGEyNy02NWU3LTRjYWEtYWUwMC02ZTE3OTZkYzkzNDciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkzNzM4NzUyLCJpYXQiOjE3OTM3MzUxNTIsImVtYWlsIjoiYWRtaW4xQG1hcmtpdGlvbi5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJzZXR1cF9hdHRlbXB0IjoxNzkwODcxNDgyMTI0fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5MzczNTE1Mn1dLCJzZXNzaW9uX2lkIjoiZjMxMTg0NGYtZjM4My00OGE0LWFhNWUtZjBhNzVjMmRlZDIwIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.jy1kO13Zlre2HJQddQIN5MJt_8N0TNzcbSOMmB_0lFc_oQM68X3VyWEBa7JG7ABHpomIZ5MJrXXjQloYbgtzeA\",\"token_type\":\"bearer\",\"expires_in\":3600,\"expires_at\":1793738752,\"refresh_token\":\"nbnfeuav7cht\",\"user\":{\"id\":\"82bd8a27-65e7-4caa-ae00-6e1796dc9347\",\"aud\":\"authenticated\",\"role\":\"authenticated\",\"email\":\"admin1@markition.com\",\"email_confirmed_at\":\"2026-10-05T13:24:05.701515Z\",\"phone\":\"\",\"confirmed_at\":\"2026-10-05T13:24:05.701515Z\",\"recovery_sent_at\":\"2026-11-02T15:51:56.684346Z\",\"last_sign_in_at\":\"2026-11-03T19:45:52.786656595Z\",\"app_metadata\":{\"provider\":\"email\",\"providers\":[\"email\"]},\"user_metadata\":{\"email_verified\":true,\"setup_attempt\":1790871482124},\"identities\":[{\"identity_id\":\"23e25135-b2c8-43ca-9d20-74905c63b474\",\"id\":\"82bd8a27-65e7-4caa-ae00-6e1796dc9347\",\"user_id\":\"82bd8a27-65e7-4caa-ae00-6e1796dc9347\",\"identity_data\":{\"email\":\"admin1@markition.com\",\"email_verified\":false,\"phone_verified\":false,\"sub\":\"82bd8a27-65e7-4caa-ae00-6e1796dc9347\"},\"provider\":\"email\",\"last_sign_in_at\":\"2026-10-01T15:21:59.965413Z\",\"created_at\":\"2026-10-01T15:21:59.965469Z\",\"updated_at\":\"2026-10-01T15:21:59.965469Z\",\"email\":\"admin1@markition.com\"}],\"created_at\":\"2026-10-01T15:21:59.95256Z\",\"updated_at\":\"2026-11-03T19:45:52.81849Z\",\"is_anonymous\":false},\"weak_password\":null}"
+        },
+        {
+          "name": "markition-crm-theme",
+          "value": "light"
+        }
+      ]
+    }
+  ]
+}

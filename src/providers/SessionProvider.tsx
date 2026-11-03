@@ -32,7 +32,7 @@ async function syncServerSession(accessToken: string | null) {
   }
 }
 
-export type AppRole = "admin" | "project_manager" | "sales" | "employee";
+export type AppRole = "super_admin" | "admin" | "bd_manager" | "bd_executive" | "viewer";
 
 type SessionContextValue = {
   token: string | null;
@@ -56,10 +56,26 @@ type SessionContextValue = {
 const SessionContext = React.createContext<SessionContextValue | undefined>(undefined);
 
 const ROLE_PERMISSIONS: Record<AppRole, string[]> = {
+  super_admin: ["*"],
   admin: ["*"],
-  project_manager: ["view_dashboard", "view_companies", "view_contacts", "view_tasks", "manage_companies", "manage_contacts", "manage_tasks"],
-  sales: ["view_dashboard", "view_leads", "view_prospects", "manage_leads", "manage_prospects"],
-  employee: ["view_dashboard"],
+  bd_manager: [
+    "view_dashboard",
+    "view_prospects", "manage_prospects",
+    "view_companies", "manage_companies",
+    "view_contacts", "manage_contacts",
+    "view_tasks", "manage_tasks",
+    "view_clients",
+    "view_reports",
+  ],
+  bd_executive: [
+    "view_dashboard",
+    "view_prospects",
+    "view_companies",
+    "view_contacts",
+    "view_tasks", "manage_tasks",
+    "view_clients",
+  ],
+  viewer: ["view_dashboard", "view_prospects", "view_companies", "view_contacts"],
 };
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -184,7 +200,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       email,
       displayName,
       isLoading,
-      isAdmin: appRole === "admin",
+      isAdmin: appRole === "admin" || appRole === "super_admin",
       roles: appRole ? [appRole] : [],
       permissions: appRole ? ROLE_PERMISSIONS[appRole] : [],
       profile: { fullName: displayName, email },

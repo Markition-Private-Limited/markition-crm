@@ -1,16 +1,31 @@
 import { adminClient } from '@/lib/supabase/admin'
 
-export type AppRole = 'admin' | 'project_manager' | 'sales' | 'employee'
+// Five BRD roles — matches app_roles.name in the DB
+export type AppRole =
+  | 'super_admin'
+  | 'admin'
+  | 'bd_manager'
+  | 'bd_executive'
+  | 'viewer'
 
+// Maps DB role names (lowercase) → AppRole enum value.
+// Includes legacy names so any residual old-role users still resolve correctly.
 const ROLE_MAP: Record<string, AppRole> = {
-  'super admin': 'admin',
-  'admin': 'admin',
-  'project manager': 'project_manager',
-  'sales manager': 'sales',
-  'sales executive': 'sales',
-  'sales': 'sales',
-  'employee': 'employee',
-  'accountant': 'employee',
+  // Current BRD roles
+  'superadministrator': 'super_admin',
+  'administrator':      'admin',
+  'bd manager':         'bd_manager',
+  'bd executive':       'bd_executive',
+  'viewer':             'viewer',
+  // Legacy fallbacks (kept until all rows are migrated)
+  'super admin':        'super_admin',
+  'admin':              'admin',
+  'project manager':    'bd_manager',
+  'sales manager':      'bd_manager',
+  'sales executive':    'bd_executive',
+  'sales':              'bd_executive',
+  'employee':           'viewer',
+  'accountant':         'viewer',
 }
 
 export interface AuthContext {
@@ -20,12 +35,10 @@ export interface AuthContext {
   roleName: string
 }
 
-// Cache keyed by userId (stable across token refreshes), TTL 60s
+// Cache keyed by userId, TTL 60s
 const ctxCache = new Map<string, { ctx: AuthContext; expiresAt: number }>()
 const CTX_TTL_MS = 60_000
 
-// Decode JWT payload without verification — only used to get sub/exp for cache lookup.
-// Actual signature verification still happens via adminClient.auth.getUser on cache miss.
 function decodeJwt(token: string): { sub?: string; exp?: number; email?: string } | null {
   try {
     const part = token.split('.')[1]
@@ -39,27 +52,17 @@ function decodeJwt(token: string): { sub?: string; exp?: number; email?: string 
 export async function getAuthContext(request: Request): Promise<AuthContext | null> {
   const authHeader = request.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) return null
-
   return getAuthContextFromToken(authHeader.slice(7))
 }
 
-// Shared by API routes (Bearer header) and proxy.ts (session cookie).
 export async function getAuthContextFromToken(token: string): Promise<AuthContext | null> {
-  // Decode locally — O(1), no network
   const payload = decodeJwt(token)
   if (!payload?.sub) return null
-
-  // Reject expired tokens immediately without a network call
   if (payload.exp && payload.exp * 1000 < Date.now()) return null
 
-  // Cache hit — keyed by userId so it survives access token refreshes
   const cached = ctxCache.get(payload.sub)
   if (cached && cached.expiresAt > Date.now()) return cached.ctx
 
-  // Cache miss — verify token via admin API and fetch role_id in parallel.
-  // adminClient.auth.getUser(token) fails with "Auth session missing!" when persistSession: false
-  // because Supabase JS v2 checks internal session state instead of verifying the JWT directly.
-  // Using admin.getUserById with the sub from the (locally-decoded) JWT avoids that bug.
   const [userRoleResult, { data: adminUser, error: adminErr }] = await Promise.all([
     adminClient
       .from('user_roles')
@@ -75,7 +78,6 @@ export async function getAuthContextFromToken(token: string): Promise<AuthContex
 
   const user = adminUser.user
 
-  // Single PK lookup — fast
   const { data: roleRow } = await adminClient
     .from('app_roles')
     .select('name')
@@ -90,7 +92,6 @@ export async function getAuthContextFromToken(token: string): Promise<AuthContex
 
   const ctx: AuthContext = { userId: user.id, email: user.email, role: appRole, roleName }
 
-  // TTL is the lesser of CTX_TTL_MS and remaining token lifetime
   const tokenTtl = payload.exp ? payload.exp * 1000 - Date.now() : CTX_TTL_MS
   ctxCache.set(user.id, { ctx, expiresAt: Date.now() + Math.min(CTX_TTL_MS, tokenTtl) })
 
@@ -113,4 +114,18 @@ export async function requireRole(
   if (!ctx) return { error: unauthorized() }
   if (!allowed.includes(ctx.role)) return { error: forbidden() }
   return { ctx }
+}
+
+// Convenience — allow any authenticated user (still fails if no valid role)
+export async function requireAuth(
+  request: Request
+): Promise<{ ctx: AuthContext; error?: never } | { ctx?: never; error: Response }> {
+  const ctx = await getAuthContext(request)
+  if (!ctx) return { error: unauthorized() }
+  return { ctx }
+}
+
+// Invalidate cached context for a user (call after role changes)
+export function invalidateAuthCache(userId: string) {
+  ctxCache.delete(userId)
 }

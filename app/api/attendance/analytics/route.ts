@@ -1,4 +1,4 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 
 function isWeekend(dateStr: string) {
@@ -17,21 +17,21 @@ function dateRange(from: string, to: string): string[] {
   return dates
 }
 
-// ── GET /api/attendance/analytics ─────────────────────────────
+// â”€â”€ GET /api/attendance/analytics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Admin only. Returns aggregated stats + chart data for a date range.
 //
 // Query params:
 //   date_from  YYYY-MM-DD  (required)
 //   date_to    YYYY-MM-DD  (required)
-//   profile_id UUID        (optional – single employee, defaults to all)
+//   profile_id UUID        (optional â€“ single employee, defaults to all)
 //
 // Response:
-//   summary         — team-wide stat cards
-//   employees       — per-employee breakdown table rows
-//   trend           — daily present/wfh/absent counts for the trend chart
-//   late_by_employee — late count per employee for the bar chart
+//   summary         â€” team-wide stat cards
+//   employees       â€” per-employee breakdown table rows
+//   trend           â€” daily present/wfh/absent counts for the trend chart
+//   late_by_employee â€” late count per employee for the bar chart
 export async function GET(request: Request) {
-  const { error: authErr } = await requireRole(request, ['admin'])
+  const { error: authErr } = await requireRole(request, ['super_admin', 'admin'])
   if (authErr) return authErr
 
   const url = new URL(request.url)
@@ -93,11 +93,11 @@ export async function GET(request: Request) {
   if (breakRes.error) return Response.json({ error: breakRes.error.message }, { status: 500 })
 
   // 3. Build lookup maps
-  // record key: profile_id|date → record
+  // record key: profile_id|date â†’ record
   const recMap = new Map<string, typeof recRes.data[number]>()
   for (const r of recRes.data ?? []) recMap.set(`${r.profile_id}|${r.work_date}`, r)
 
-  // wfh key: profile_id|date → submission
+  // wfh key: profile_id|date â†’ submission
   const wfhMap = new Map<string, typeof wfhRes.data[number]>()
   for (const w of wfhRes.data ?? []) wfhMap.set(`${w.profile_id}|${w.work_date}`, w)
 
@@ -155,7 +155,7 @@ export async function GET(request: Request) {
   const attendedDays  = totalPresent + totalWfh
   const attendanceRate = totalExpected > 0 ? Math.round((attendedDays / totalExpected) * 100) : 0
 
-  // 7. Trend data — daily team-wide counts
+  // 7. Trend data â€” daily team-wide counts
   type TrendPoint = { date: string; present: number; wfh: number; absent: number }
   const trend: TrendPoint[] = workDays.map((date) => {
     let p = 0, w = 0, a = 0

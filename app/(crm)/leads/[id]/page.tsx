@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -40,7 +40,7 @@ export default function LeadDetailPage() {
   const [saving, setSaving] = React.useState(false);
   const [updatingStatus, setUpdatingStatus] = React.useState(false);
 
-  const canEdit = appRole === "admin" || appRole === "sales";
+  const canEdit = appRole === "admin" || appRole === "bd_executive";
 
   React.useEffect(() => {
     if (!token || !id) return;

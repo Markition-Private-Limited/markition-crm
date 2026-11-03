@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -82,8 +82,8 @@ export default function CompanyDetailPage() {
   const [newContact, setNewContact] = React.useState({ first_name: "", last_name: "", email: "", phone: "", title: "", is_primary: false });
   const [addingContact, setAddingContact] = React.useState(false);
 
-  const canEdit = appRole === "admin" || appRole === "project_manager";
-  const canManageProspects = appRole === "admin" || appRole === "sales";
+  const canEdit = appRole === "admin" || appRole === "bd_manager";
+  const canManageProspects = appRole === "admin" || appRole === "bd_executive";
 
   // Load only company on mount — tab data loads lazily on first tab visit
   React.useEffect(() => {

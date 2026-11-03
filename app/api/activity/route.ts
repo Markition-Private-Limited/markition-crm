@@ -1,8 +1,8 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 
 export async function GET(request: Request) {
-  const { ctx, error } = await requireRole(request, ['admin', 'project_manager', 'sales'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager', 'bd_executive'])
   if (error) return error
 
   const url = new URL(request.url)

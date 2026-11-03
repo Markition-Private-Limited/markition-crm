@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -42,7 +42,7 @@ export default function TaskDetailPage() {
   const [editDueDate, setEditDueDate] = React.useState("");
   const [saving, setSaving] = React.useState(false);
 
-  const canEdit = appRole === "admin" || appRole === "project_manager";
+  const canEdit = appRole === "admin" || appRole === "bd_manager";
 
   React.useEffect(() => {
     if (!token || !id) return;

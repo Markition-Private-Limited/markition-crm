@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -38,7 +38,7 @@ export default function ClientsPage() {
       .finally(() => setLoading(false));
   }, [token, search]);
 
-  const canCreate = appRole === "admin" || appRole === "project_manager";
+  const canCreate = appRole === "admin" || appRole === "bd_manager";
   const canDelete = appRole === "admin";
 
   const handleDelete = async (id: string) => {

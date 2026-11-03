@@ -39,3 +39,4 @@ export const apiPost   = (path: string, token: string | null, body: unknown) => 
 export const apiPut    = (path: string, token: string | null, body: unknown) => apiFetch("PUT",    path, token, body)
 export const apiPatch  = (path: string, token: string | null, body: unknown) => apiFetch("PATCH",  path, token, body)
 export const apiDelete = (path: string, token: string | null, body?: unknown) => apiFetch("DELETE", path, token, body)
+export const clearCache = () => _cache?.clear()

@@ -1,15 +1,15 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole, getAuthContext, unauthorized } from '@/lib/auth/require-role'
 
-// ── GET /api/attendance/breaks ────────────────────────────────
+// â”€â”€ GET /api/attendance/breaks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Admin:    any employee's breaks by profile_id + date/range.
 // Employee: own breaks only (profile_id param ignored).
 //
 // Query params:
-//   profile_id  — (admin only) UUID; omit for all employees
-//   date        — exact date YYYY-MM-DD
-//   date_from   — range start
-//   date_to     — range end
+//   profile_id  â€” (admin only) UUID; omit for all employees
+//   date        â€” exact date YYYY-MM-DD
+//   date_from   â€” range start
+//   date_to     â€” range end
 export async function GET(request: Request) {
   const url = new URL(request.url)
   const dateParam      = url.searchParams.get('date')
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   const dateTo         = url.searchParams.get('date_to')
   const profileIdParam = url.searchParams.get('profile_id')
 
-  const { error: roleErr } = await requireRole(request, ['admin'])
+  const { error: roleErr } = await requireRole(request, ['super_admin', 'admin'])
   const isAdmin = !roleErr
 
   let targetProfileId: string | null = null

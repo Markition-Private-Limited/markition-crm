@@ -1,15 +1,15 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole, getAuthContext, unauthorized } from '@/lib/auth/require-role'
 
-// ── GET /api/attendance/records ───────────────────────────────
+// â”€â”€ GET /api/attendance/records â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Admin:    any employee's record(s) filtered by profile_id and date/range.
 // Employee: own records only (profile_id param ignored if provided by non-admin).
 //
 // Query params:
-//   profile_id  — (admin only) UUID of the employee; omit for all employees
-//   date        — exact date YYYY-MM-DD (mutually exclusive with date_from/date_to)
-//   date_from   — range start YYYY-MM-DD
-//   date_to     — range end   YYYY-MM-DD
+//   profile_id  â€” (admin only) UUID of the employee; omit for all employees
+//   date        â€” exact date YYYY-MM-DD (mutually exclusive with date_from/date_to)
+//   date_from   â€” range start YYYY-MM-DD
+//   date_to     â€” range end   YYYY-MM-DD
 export async function GET(request: Request) {
   const url = new URL(request.url)
   const dateParam     = url.searchParams.get('date')
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   const profileIdParam = url.searchParams.get('profile_id')
 
   // Try admin first, fall back to any-authenticated employee
-  const { error: roleErr, ctx: adminCtx } = await requireRole(request, ['admin'])
+  const { error: roleErr, ctx: adminCtx } = await requireRole(request, ['super_admin', 'admin'])
   const isAdmin = !roleErr
 
   let targetProfileId: string | null = null

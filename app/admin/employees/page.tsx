@@ -23,8 +23,11 @@ type CreatedEmployee = {
 };
 
 const ROLE_OPTIONS = [
-  { value: "Sales", label: "Sales" },
-  { value: "Project Manager", label: "Project Manager" },
+  { value: "BD Executive", label: "BD Executive" },
+  { value: "BD Manager", label: "BD Manager" },
+  { value: "Administrator", label: "Administrator" },
+  { value: "Viewer", label: "Viewer" },
+  // SuperAdministrator is not assignable through this UI
 ];
 
 function fmtDate(d: string) {
@@ -47,7 +50,7 @@ export default function EmployeesPage() {
   const [showForm, setShowForm] = React.useState(false);
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
-  const [roleName, setRoleName] = React.useState("Sales");
+  const [roleName, setRoleName] = React.useState("BD Executive");
   const [password, setPassword] = React.useState("");
   const [showPw, setShowPw] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
@@ -74,7 +77,7 @@ export default function EmployeesPage() {
   const openForm = () => {
     setFullName("");
     setEmail("");
-    setRoleName("Sales");
+    setRoleName("BD Executive");
     setPassword("");
     setShowPw(false);
     setFormError(null);

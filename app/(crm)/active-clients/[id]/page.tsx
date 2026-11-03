@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -44,7 +44,7 @@ export default function ClientDetailPage() {
   const [updatingStatus, setUpdatingStatus] = React.useState(false);
   const [activityKey, setActivityKey] = React.useState(0);
 
-  const canManage = appRole === "admin" || appRole === "project_manager";
+  const canManage = appRole === "admin" || appRole === "bd_manager";
 
   React.useEffect(() => {
     if (!token || !id) return;

@@ -1,4 +1,4 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 import { logActivity } from '@/lib/activity'
 
@@ -6,7 +6,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { ctx, error } = await requireRole(request, ['admin', 'sales'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager', 'bd_executive'])
   if (error) return error
 
   const { id } = await params

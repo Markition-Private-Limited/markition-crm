@@ -1,4 +1,4 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole, getAuthContext, unauthorized } from '@/lib/auth/require-role'
 
 function isLateSubmission(workDate: string, shiftEndTime: string | null): boolean {
@@ -9,7 +9,7 @@ function isLateSubmission(workDate: string, shiftEndTime: string | null): boolea
   return new Date() > deadline
 }
 
-// ── POST /api/attendance/wfh ──────────────────────────────────
+// â”€â”€ POST /api/attendance/wfh â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Employee submits WFH proof for a specific date.
 // Body: multipart/form-data
 //   work_date   YYYY-MM-DD  (required)
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
         { status: 409 },
       )
     }
-    // Allow update while pending — fall through to upsert below
+    // Allow update while pending â€” fall through to upsert below
   }
 
   // Determine if submitted late vs the employee's active shift end time
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
   return Response.json({ submission: data, submitted_late: submittedLate }, { status: existing ? 200 : 201 })
 }
 
-// ── GET /api/attendance/wfh ───────────────────────────────────
+// â”€â”€ GET /api/attendance/wfh â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Employee: own submissions, optional date filters.
 // Admin: all submissions, optional profile_id + status + date filters.
 //
@@ -131,7 +131,7 @@ export async function GET(request: Request) {
   const dateTo         = url.searchParams.get('date_to')
   const profileIdParam = url.searchParams.get('profile_id')
 
-  const { error: roleErr } = await requireRole(request, ['admin'])
+  const { error: roleErr } = await requireRole(request, ['super_admin', 'admin'])
   const isAdmin = !roleErr
 
   let targetProfileId: string | null = null

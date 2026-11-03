@@ -1,11 +1,11 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { ctx, error } = await requireRole(request, ['admin'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin'])
   if (error) return error
 
   const { id } = await params
@@ -28,7 +28,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { ctx, error } = await requireRole(request, ['admin'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin'])
   if (error) return error
 
   const { id } = await params

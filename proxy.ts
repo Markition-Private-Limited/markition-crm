@@ -10,7 +10,7 @@ const PUBLIC_FILE = /^\/_next\/.+|\/.+\.(.*)$/;
 // Roles come from the same mapping as lib/auth/require-role.ts.
 const PROTECTED_ROUTES: Array<{ prefix: string; roles?: AppRole[] }> = [
   { prefix: "/attendance" },
-  { prefix: "/admin", roles: ["admin"] },
+  { prefix: "/admin", roles: ["admin", "super_admin"] },
 ];
 
 export async function proxy(request: NextRequest) {

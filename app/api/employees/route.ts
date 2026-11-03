@@ -1,11 +1,12 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 import pg from 'pg'
 
 // Roles admin can create — name must match app_roles.name exactly (case-insensitive lookup)
-const ALLOWED_ROLE_NAMES = ['Sales', 'Project Manager', 'Employee', 'Accountant']
+// SuperAdministrator is intentionally excluded — only the system can assign that role
+const ALLOWED_ROLE_NAMES = ['BD Executive', 'BD Manager', 'Administrator', 'Viewer']
 
-// Direct postgres pool — bypasses PostgREST so auth.users is visible in the same session.
+// Direct postgres pool â€” bypasses PostgREST so auth.users is visible in the same session.
 // This avoids the FK cross-connection visibility issue when inserting into user_roles
 // immediately after adminClient.auth.admin.createUser() via GoTrue.
 const pgPool = new pg.Pool({
@@ -14,10 +15,10 @@ const pgPool = new pg.Pool({
   ssl: { rejectUnauthorized: false },
 })
 
-// ── GET /api/employees ────────────────────────────────────────
+// â”€â”€ GET /api/employees â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Admin only: list all profiles with name, email, role, created_at
 export async function GET(request: Request) {
-  const { error } = await requireRole(request, ['admin'])
+  const { error } = await requireRole(request, ['super_admin', 'admin'])
   if (error) return error
 
   const { data: profiles, error: pErr } = await adminClient
@@ -49,12 +50,12 @@ export async function GET(request: Request) {
   return Response.json(result)
 }
 
-// ── POST /api/employees ───────────────────────────────────────
+// â”€â”€ POST /api/employees â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Admin only: create a new employee (auth user + profile + role).
 // Returns { id, email, full_name, role, temporary_password } on success.
 // temporary_password is shown once; admin must share it with the new hire.
 export async function POST(request: Request) {
-  const { error } = await requireRole(request, ['admin'])
+  const { error } = await requireRole(request, ['super_admin', 'admin'])
   if (error) return error
 
   let body: { full_name?: string; email?: string; role_name?: string; password?: string }
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
   if (!role_name) return Response.json({ error: 'role_name is required' }, { status: 400 })
   if (!password || password.length < 8) return Response.json({ error: 'password must be at least 8 characters' }, { status: 400 })
 
-  // Validate role choice — only Sales and Project Manager are allowed here
+  // Validate role choice â€” only Sales and Project Manager are allowed here
   const normalised = ALLOWED_ROLE_NAMES.find((r) => r.toLowerCase() === role_name.toLowerCase())
   if (!normalised) {
     return Response.json(
@@ -121,7 +122,7 @@ export async function POST(request: Request) {
   // Use a direct pg connection to insert in the same DB session where the newly-created
   // auth user is visible. PostgREST uses a separate connection and cannot always see a
   // user committed by GoTrue immediately, causing FK violations.
-  // user_roles.user_id FK → public.users.id, so public.users must be populated first.
+  // user_roles.user_id FK â†’ public.users.id, so public.users must be populated first.
   const nameParts = normalName.split(' ')
   const firstName = nameParts[0] ?? normalName
   const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName

@@ -1,11 +1,11 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole, getAuthContext, unauthorized } from '@/lib/auth/require-role'
 
-// ── GET /api/attendance/shifts ────────────────────────────────
+// â”€â”€ GET /api/attendance/shifts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Admin: list all profiles with their currently active shift.
 // An employee with no shift has current_shift: null.
 export async function GET(request: Request) {
-  const { error } = await requireRole(request, ['admin'])
+  const { error } = await requireRole(request, ['super_admin', 'admin'])
   if (error) return error
 
   const [{ data: profiles, error: pErr }, { data: staffProfiles, error: spErr }, { data: activeShifts, error: sErr }] =
@@ -34,12 +34,12 @@ export async function GET(request: Request) {
   return Response.json(result)
 }
 
-// ── POST /api/attendance/shifts ───────────────────────────────
+// â”€â”€ POST /api/attendance/shifts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Admin: assign a new shift to an employee, or change their current one.
 // When a current open shift exists, it is closed (effective_to set to
 // effectiveFrom - 1 day) before the new one is inserted, preserving history.
 export async function POST(request: Request) {
-  const { ctx, error } = await requireRole(request, ['admin'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin'])
   if (error) return error
 
   let body: { profile_id?: string; start_time?: string; end_time?: string; effective_from?: string }
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
     if (closeErr) return Response.json({ error: closeErr.message }, { status: 500 })
   }
 
-  // Insert the new shift — trigger will write changelog automatically
+  // Insert the new shift â€” trigger will write changelog automatically
   const { data: newShift, error: insertErr } = await adminClient
     .from('attendance_shifts')
     .insert({

@@ -1,4 +1,4 @@
-import { adminClient } from '@/lib/supabase/admin'
+﻿import { adminClient } from '@/lib/supabase/admin'
 import { requireRole } from '@/lib/auth/require-role'
 import { logTaskChange } from '@/lib/tasks/changelog'
 import { logFieldChanges } from '@/lib/activity'
@@ -7,7 +7,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { ctx, error } = await requireRole(request, ['admin', 'project_manager'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager'])
   if (error) return error
 
   const { id } = await params
@@ -44,7 +44,7 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { ctx, error } = await requireRole(request, ['admin', 'project_manager'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager'])
   if (error) return error
 
   const { id } = await params
@@ -100,7 +100,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { ctx, error } = await requireRole(request, ['admin', 'project_manager'])
+  const { ctx, error } = await requireRole(request, ['super_admin', 'admin', 'bd_manager'])
   if (error) return error
 
   const { id } = await params

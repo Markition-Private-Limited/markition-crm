@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -54,13 +54,13 @@ export default function TasksPage() {
   const [creating, setCreating] = React.useState(false);
 
   React.useEffect(() => {
-    if (appRole === "sales") router.replace("/dashboard");
+    if (appRole === "bd_executive") router.replace("/dashboard");
   }, [appRole, router]);
 
-  const canCreate = appRole === "admin" || appRole === "project_manager";
+  const canCreate = appRole === "admin" || appRole === "bd_manager";
 
   React.useEffect(() => {
-    if (!token || appRole === "sales") return;
+    if (!token || appRole === "bd_executive") return;
     setLoading(true);
     const qs = statusFilter !== "All" ? `?status=${encodeURIComponent(statusFilter)}` : "";
     Promise.all([
@@ -120,7 +120,7 @@ export default function TasksPage() {
 
   const canSubmit = newTitle.trim() && (parentType === "company" ? !!newCompanyId : !!newClientId);
 
-  if (appRole === "sales") return null;
+  if (appRole === "bd_executive") return null;
 
   return (
     <div className="space-y-6">

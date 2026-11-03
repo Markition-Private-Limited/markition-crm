@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -41,7 +41,7 @@ export default function DashboardPage() {
     if (!token || !appRole) return;
     const fetches: Promise<unknown>[] = [
       apiGet("/api/tasks", token).catch(() => []),
-      (appRole === "admin" || appRole === "sales") ? apiGet("/api/prospects", token).catch(() => []) : Promise.resolve([]),
+      (appRole === "admin" || appRole === "bd_executive") ? apiGet("/api/prospects", token).catch(() => []) : Promise.resolve([]),
     ];
     Promise.all(fetches)
       .then(([ts, ps]) => {
@@ -60,7 +60,7 @@ export default function DashboardPage() {
   );
   const newProspects = prospects.filter((p) => p.status === "first_contact");
 
-  const displayTasks = appRole === "admin" || appRole === "project_manager"
+  const displayTasks = appRole === "admin" || appRole === "bd_manager"
     ? myTasks.length > 0 ? myTasks : openTasks.slice(0, 5)
     : myTasks.slice(0, 5);
 
@@ -85,7 +85,7 @@ export default function DashboardPage() {
 
       {/* Stats row */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {(appRole === "admin" || appRole === "project_manager") && (
+        {(appRole === "admin" || appRole === "bd_manager") && (
           <>
             <StatCard label="Open Tasks" value={openTasks.length} sub="Across all assignees" />
             <StatCard label="My Tasks" value={myTasks.length} sub="Assigned to me" />
@@ -93,7 +93,7 @@ export default function DashboardPage() {
             <StatCard label="New Prospects" value={newProspects.length} sub="Awaiting contact" />
           </>
         )}
-        {appRole === "sales" && (
+        {appRole === "bd_executive" && (
           <>
             <StatCard label="My Tasks" value={myTasks.length} sub="Assigned to me" />
             <StatCard label="New Prospects" value={newProspects.length} sub="Awaiting contact" />
@@ -108,10 +108,10 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                {appRole === "admin" || appRole === "project_manager" ? "Tasks" : "My Tasks"}
+                {appRole === "admin" || appRole === "bd_manager" ? "Tasks" : "My Tasks"}
               </p>
               <h2 className="mt-0.5 text-base font-semibold text-foreground">
-                {appRole === "sales" ? "Assigned to me" : myTasks.length > 0 ? "Assigned to me" : "Open tasks"}
+                {appRole === "bd_executive" ? "Assigned to me" : myTasks.length > 0 ? "Assigned to me" : "Open tasks"}
               </h2>
             </div>
             <Link href="/tasks" className="flex items-center gap-1 text-xs font-medium text-accent hover:underline">
@@ -123,7 +123,7 @@ export default function DashboardPage() {
             <div className="flex flex-col items-center gap-2 rounded-[18px] border border-dashed border-border py-10 text-center">
               <ClipboardList className="h-8 w-8 text-muted-foreground/40" />
               <p className="text-sm text-muted-foreground">No tasks yet.</p>
-              {(appRole === "admin" || appRole === "project_manager") && (
+              {(appRole === "admin" || appRole === "bd_manager") && (
                 <Link href="/tasks" className="mt-1 inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
                   <Plus className="h-3 w-3" /> New Task
                 </Link>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
 
         {/* Right panel — Leads for sales/admin, Quick actions for PM */}
         <div className="space-y-4">
-          {(appRole === "admin" || appRole === "sales") && (
+          {(appRole === "admin" || appRole === "bd_executive") && (
             <div className="rounded-[24px] border border-border bg-surface p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -187,7 +187,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {appRole === "project_manager" && (
+          {appRole === "bd_manager" && (
             <div className="rounded-[24px] border border-border bg-surface p-6">
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground mb-4">Quick Actions</p>
               <div className="space-y-2">

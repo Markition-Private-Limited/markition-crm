@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -229,7 +229,7 @@ export default function NewCompanyPage() {
   const [prospects, setProspects] = React.useState<ProspectDraft[]>([emptyProspect()]);
 
   const isAdmin = appRole === "admin";
-  const canConvert = appRole === "admin" || appRole === "sales";
+  const canConvert = appRole === "admin" || appRole === "bd_executive";
 
   React.useEffect(() => {
     if (!token) return;

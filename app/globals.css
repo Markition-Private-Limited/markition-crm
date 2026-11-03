@@ -90,3 +90,11 @@ select {
 select {
   padding-right: 2rem;
 }
+
+/* Date/time inputs: inherit the document color-scheme so the browser
+   renders the calendar picker in dark mode when the app is dark. */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color-scheme: inherit;
+}
